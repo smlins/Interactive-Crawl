@@ -5,6 +5,10 @@
 > - [x] Form表单；
 > - [x] 各种标签的onclick事件；
 > - [x] a标签内的JavaScript代码;
+> - [ ] 下拉列表等隐藏式交互事件触发；
+> - [ ] 不带有onclick属性的按钮交互事件触发；
+> - [ ] 非form表单的输入框输入；
+> - [ ] 其他;
 
 ## Installation
 
@@ -51,11 +55,11 @@ python3 crawl.py http://example.com --cookie "PHPSESSID=gbo3fci62fpig5vp4fq6a950
 python3 crawl.py http://example.com --proxy-server "127.0.0.1:8000"
 ```
 
+
 ## Todo
 
 
 - [ ] 性能优化，合理使用协程加快爬取速度并增加访问频率参数；
 - [ ] 增加script（在考虑是否使用装饰器实现）加载模块，用于自定义操作，例如识别到用户登录界面，若有对应脚本可进行爆破，后期也可作网站指纹识别；
-- [ ] 增加下拉列表等隐藏式交互事件触发；
-- [ ] 增加不带有onclick属性的按钮交互事件触发；
+- [ ] 增加网站指纹识别功能;
 
