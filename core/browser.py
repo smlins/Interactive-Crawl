@@ -377,19 +377,3 @@ class Browsers:
             sleep(1)
 
 
-async def main(url):
-    a = Browsers(timeout=5)
-
-    await a.go_by_page(url)
-    await asyncio.sleep(3)
-
-
-def test(loop, context):
-    print(context['exception'])
-
-
-if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
-    loop.set_exception_handler(test)
-    loop.run_until_complete(main('http://47.112.153.42:8082'))
-
