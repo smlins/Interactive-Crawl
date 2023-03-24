@@ -1,6 +1,6 @@
 # InteractiveCrawler - 交互式Web网站爬虫
 <a href="https://github.com/ITNAX/Interactive-Crawl"><img alt="Release" src="https://img.shields.io/badge/python-3.8+-blue"></a>
-<a href="https://github.com/ITNAX/Interactive-Crawl"><img alt="Release" src="https://img.shields.io/badge/pyppeteer%201.0.2-blueviolet"></a>
+<a href="https://github.com/ITNAX/Interactive-Crawl"><img alt="Release" src="https://img.shields.io/badge/pyppeteer-1.0.2-blueviolet"></a>
 > ​		Interactive Crawler是一款交互式爬虫工具，不仅可以爬取页面中的超链接，还能获取通过页面的各种交互事件触发所发起的请求，支持代理设置，可结合其他漏洞扫描工具使用。目前支持以下事件的触发：
 >
 > - [x] Form表单；
