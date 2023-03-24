@@ -133,7 +133,6 @@ class MultiProcess(Process):
                     self._result = self.exec_func(*self.func_args)
                     self.finished()
                 except BaseException as e:
-                    print(123123)
                     logging.error(e)
             elif self.state == 2:
                 # The task will not end after completion, but will be suspended

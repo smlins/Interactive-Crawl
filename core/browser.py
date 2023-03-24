@@ -142,8 +142,8 @@ class Browsers:
             if self.http_context_callback:
                 self.http_context_callback(request=req_json, response=res_json)
 
-
-    async def waitEventsForNavigation(self, page: Page, event):
+    @staticmethod
+    async def waitEventsForNavigation(page: Page, event):
         try:
             await asyncio.wait({
                 asyncio.create_task(event),
@@ -152,8 +152,8 @@ class Browsers:
         except BaseException as e:
             logging.error(e, exc_info=True)
 
-
-    async def waitEventsForResponse(self, page: Page, event):
+    @staticmethod
+    async def waitEventsForResponse(page: Page, event):
         try:
             await asyncio.wait({
                 asyncio.create_task(event),
