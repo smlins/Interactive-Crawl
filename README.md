@@ -55,6 +55,8 @@ python3 crawl.py http://example.com --cookie "PHPSESSID=gbo3fci62fpig5vp4fq6a950
 python3 crawl.py http://example.com --proxy-server "127.0.0.1:8000"
 ```
 
+![demo1](https://user-images.githubusercontent.com/33826067/227392328-19bd3c61-6ccb-46e6-b8b1-baf4275d471f.gif)
+
 
 ## Todo
 
