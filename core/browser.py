@@ -34,7 +34,7 @@ class Browsers:
         self.max_page_nums = max_page_nums
         self.options = {
             'headless': headless,
-            'ignorehttpserrrors': True,
+            'ignoreHTTPSErrors': True,
             'args': args,
             'handleSIGINT': False,
             'handleSIGTERM': False,
