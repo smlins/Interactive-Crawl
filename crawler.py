@@ -16,7 +16,7 @@ def get_screen_size():
 
 
 def main():
-    parse = argparse.ArgumentParser(description='Interactive Crawl V1.0')
+    parse = argparse.ArgumentParser(description='Interactive Crawl')
     parse.add_argument('url', help='url of website to be crawled')
     # browser config
     parse.add_argument('-t', '--timeout', metavar='', type=int, help='The timeout for all page requests, which is 5 seconds by default', default=5)
