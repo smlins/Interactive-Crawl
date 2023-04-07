@@ -82,7 +82,7 @@ class MultiCoroutine:
             asyncio.set_event_loop(loop)
             loop.run_forever()
         except Exception as e:
-            logging.error(e)
+            logging.error(e, exc_info=True)
         finally:
             logging.info('loop will be close.')
             loop.run_until_complete(loop.shutdown_asyncgens())
@@ -133,7 +133,7 @@ class MultiProcess(Process):
                     self._result = self.exec_func(*self.func_args)
                     self.finished()
                 except BaseException as e:
-                    logging.error(e)
+                    logging.error(e, exc_info=True)
             elif self.state == 2:
                 # The task will not end after completion, but will be suspended
                 sleep(1)

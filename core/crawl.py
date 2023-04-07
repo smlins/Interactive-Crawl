@@ -28,6 +28,7 @@ class Crawl:
             headers=kwargs['headers'] if 'headers' in kwargs else None,
             screen_size=kwargs['screen_size'] if 'screen_size' in kwargs else None,
             exclude_links_keyword=kwargs['exclude_links_keyword'] if 'exclude_links_keyword' in kwargs else None,
+            prohibit_load=kwargs['prohibit_load'] if 'prohibit_load' in kwargs else None
         )
         self.state = 1  # stop is 0, running is 1, finish is 2
         self.thread_task = MultiCoroutine(concurrency=maximum_requests, daemon=False, loop=self.loop)
@@ -119,7 +120,7 @@ class Crawl:
                 else:
                     time.sleep(1)
             except BaseException as e:
-                logging.error(e)
+                logging.error(e, exc_info=True)
 
     def stop_crawl(self):
         self.state = 2
@@ -148,10 +149,11 @@ def crawl_task_run(url, server_pipe, options=None, maximum_requests=1):
     args = options['args']
     headless = options['headless']
     req_type = options['req_type']
-    external_links = options['external-links']
+    external_links = options['external_links']
     timeout = options['timeout']
     headers = options['headers']
     screen_size = options['screen_size']
+    prohibit_load = options['prohibit_load']
     task = Crawl(
         url=url,
         maximum_requests=maximum_requests,
@@ -161,7 +163,8 @@ def crawl_task_run(url, server_pipe, options=None, maximum_requests=1):
         external_links=external_links,
         timeout=timeout,
         headers=headers,
-        screen_size=screen_size
+        screen_size=screen_size,
+        prohibit_load=prohibit_load
     )
     task.start_crawl()
     logging.info('thread task is exit')

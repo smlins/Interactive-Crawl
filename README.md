@@ -33,9 +33,10 @@ python crawler.py http://example.com
   --headless             浏览器的无头操作模式，默认为false
   --exclude-links        如果链接包含此关键字，则不会发出任何请求。多个关键字由字符“，”分隔
   --crawl-link-type      爬网程序爬网的网络资源类型，默认爬取xhr、fetch、document
+  --prohibit-load-type   禁止加载的网络资源类型，默认禁止加载image,media,font,manifest，该配置选项是优先级最高的
   --crawl-external-links 设置是否爬取外部链接爬网，默认情况下，仅对同一网站链接进行爬网（不推荐）
-
 ```
+> 注意：若配置了`prohibit-load-type`配置中包含`document`类型，则`crawl-link-type`配置中的`document`类型则失效。
 
 ## Examples
 
