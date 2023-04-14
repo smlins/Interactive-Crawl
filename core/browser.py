@@ -15,10 +15,7 @@ class Browsers:
     def __init__(self, max_page_nums=3, timeout=3, http_context_callback=None, filter_req_type=None, headless=False,
                  args=None, loop=None, headers=None, screen_size=None, exclude_links_keyword=None, prohibit_load=None):
         if args is None:
-            args = []
-        default_args = ['--start-maximized', '--enable-automation', '--no-sandbox', '--disable-infobars',
-                        '--disable-gpu']
-        args += default_args
+            args = ['--start-maximized', '--enable-automation', '--no-sandbox', '--disable-infobars', '--disable-gpu']
 
         if filter_req_type is None:
             filter_req_type = ['xhr', 'document', 'fetch']
@@ -83,7 +80,7 @@ class Browsers:
         # 有一个Error待记录
         self.browser = await launch(**self.options)
         self.context = self.browser.browserContexts[0]
-        print(self.max_page_nums)
+
         for i in range(self.max_page_nums - 1):
             await self.context.newPage()
 
@@ -100,11 +97,13 @@ class Browsers:
             await page.setExtraHTTPHeaders(self.headers)
         if self.screen_size:
             await page.setViewport(self.screen_size)
+
         page.setDefaultNavigationTimeout(self.timeout * 1000)
-        await page.setRequestInterception(True)
+        # 暂时先不截取请求包，即暂不对资源的加载进行控制
+        # await page.setRequestInterception(True)
         await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
                                 "Chrome/66.0.3359.181 Safari/537.36")
-        page.on('request', lambda request: asyncio.ensure_future(self.intercept_request(request)))
+        # page.on('request', lambda request: asyncio.ensure_future(self.intercept_request(request)))
         page.on('response', lambda response: asyncio.ensure_future(self.intercept_response(response)))
         page.on('dialog', lambda dialog: asyncio.ensure_future(self.close_dialog(dialog)))
 
