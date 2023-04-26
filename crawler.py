@@ -23,7 +23,7 @@ def main():
                        help='The timeout for all page requests, which is 5 seconds by default', default=5)
     parse.add_argument('--cookie', metavar='', help='Set Http Cookie')
     parse.add_argument('--proxy-server', metavar='', help='Http proxy address in the form of host:port')
-    parse.add_argument('--headless', help='operation mode of browser and true by default', metavar='', default=True)
+    parse.add_argument('--headless', help='enable headless mode', action='store_true')
     parse.add_argument('--exclude-links', metavar='',
                        help='If the link contains this keyword, no request will be made. Support for regular '
                             'expressions.')
@@ -51,6 +51,7 @@ def main():
         'req_type': [],
         'timeout': args.timeout,
         'headers': {},
+        'intercept_request': args.intercept_request,
         'screen_size': None
     }
 

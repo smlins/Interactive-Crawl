@@ -25,7 +25,7 @@ class Browsers:
             prohibit_load = ['image', 'media', 'font', 'manifest']
 
 
-        self.intercept_request = intercept_request
+        self.enable_intercept = intercept_request
         self.page_manage = PageManage()
         self.browser = None
         self.context = None
@@ -104,11 +104,11 @@ class Browsers:
         page.setDefaultNavigationTimeout(self.timeout * 1000)
 
         # 按需开启
-        if self.intercept_request:
+        if self.enable_intercept:
             await page.setRequestInterception(True)
         await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
                                 "Chrome/66.0.3359.181 Safari/537.36")
-        if self.intercept_request:
+        if self.enable_intercept:
             page.on('request', lambda request: asyncio.ensure_future(self.intercept_request(request)))
         page.on('response', lambda response: asyncio.ensure_future(self.intercept_response(response)))
         page.on('dialog', lambda dialog: asyncio.ensure_future(self.close_dialog(dialog)))

@@ -21,7 +21,7 @@ class Crawl:
             max_page_nums=self.maximum_requests,
             http_context_callback=self.http_context_handle,
             headless=kwargs['headless'] if 'headless' in kwargs else False,
-            args=kwargs['options'] if 'options' in kwargs else None,
+            args=kwargs['args'] if 'args' in kwargs else None,
             loop=self.loop,
             filter_req_type=kwargs['filter_req_type'] if 'filter_req_type' in kwargs else None,
             timeout=timeout,
@@ -29,7 +29,7 @@ class Crawl:
             screen_size=kwargs['screen_size'] if 'screen_size' in kwargs else None,
             exclude_links_keyword=kwargs['exclude_links'] if 'exclude_links' in kwargs else None,
             prohibit_load=kwargs['prohibit_load'] if 'prohibit_load' in kwargs else None,
-            intercept_request=kwargs['intercept_request'] if 'intercept_request' in kwargs else None
+            intercept_request=kwargs['intercept_request'] if 'intercept_request' in kwargs else None,
         )
         self.state = 1  # stop is 0, running is 1, finish is 2
         self.thread_task = MultiCoroutine(concurrency=maximum_requests, daemon=False, loop=self.loop)
