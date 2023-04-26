@@ -35,6 +35,8 @@ python crawler.py http://example.com
   --crawl-link-type      爬网程序爬网的网络资源类型，默认爬取xhr、fetch、document
   --prohibit-load-type   禁止加载的网络资源类型，默认禁止加载image,media,font,manifest，该配置选项是优先级最高的
   --crawl-external-links 设置是否爬取外部链接爬网，默认情况下，仅对同一网站链接进行爬网（不推荐）
+  --intercept-request    开启http请求拦截，只有当该选项开启后，--prohibit-load-type参数才生效
+
 ```
 > 注意：若配置了`prohibit-load-type`配置中包含`document`类型，则`crawl-link-type`配置中的`document`类型则失效。
 
