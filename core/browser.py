@@ -12,8 +12,9 @@ from pyppeteer.network_manager import Response, Request
 
 
 class Browsers:
-    def __init__(self, max_page_nums=3, timeout=3, http_context_callback=None, filter_req_type=None, headless=False,
-                 args=None, loop=None, headers=None, screen_size=None, exclude_links_keyword=None, prohibit_load=None):
+    def __init__(self, max_page_nums=1, timeout=3, http_context_callback=None, filter_req_type=None, headless=False,
+                 args=None, loop=None, headers=None, screen_size=None, exclude_links_keyword=None, prohibit_load=None,
+                 intercept_request=False):
         if args is None:
             args = ['--start-maximized', '--enable-automation', '--no-sandbox', '--disable-infobars', '--disable-gpu']
 
@@ -23,6 +24,8 @@ class Browsers:
         if prohibit_load is None:
             prohibit_load = ['image', 'media', 'font', 'manifest']
 
+
+        self.intercept_request = intercept_request
         self.page_manage = PageManage()
         self.browser = None
         self.context = None
@@ -99,11 +102,14 @@ class Browsers:
             await page.setViewport(self.screen_size)
 
         page.setDefaultNavigationTimeout(self.timeout * 1000)
-        # 暂时先不截取请求包，即暂不对资源的加载进行控制
-        # await page.setRequestInterception(True)
+
+        # 按需开启
+        if self.intercept_request:
+            await page.setRequestInterception(True)
         await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
                                 "Chrome/66.0.3359.181 Safari/537.36")
-        # page.on('request', lambda request: asyncio.ensure_future(self.intercept_request(request)))
+        if self.intercept_request:
+            page.on('request', lambda request: asyncio.ensure_future(self.intercept_request(request)))
         page.on('response', lambda response: asyncio.ensure_future(self.intercept_response(response)))
         page.on('dialog', lambda dialog: asyncio.ensure_future(self.close_dialog(dialog)))
 
@@ -119,7 +125,6 @@ class Browsers:
                 await request.continue_()
         except Exception as e:
             logging.error(e, exc_info=True)
-
 
     async def intercept_response(self, response: Response):
         request = response.request
@@ -141,12 +146,12 @@ class Browsers:
             # print(res_json['status'], req_json['method'], req_json['url'], req_json['data'])
             if self.http_context_callback:
                 self.http_context_callback(request=req_json, response=res_json)
-        else:
-            if request.resourceType in ['script']:
-                for finger in ['ueditor']:
-                    if finger in request.url and finger not in self.finger:
-                        self.finger.append(finger)
-                        logging.info('[+] Found {} script in {}'.format(finger, request.url))
+        # else:
+        #     if request.resourceType in ['script']:
+        #         for finger in ['ueditor']:
+        #             if finger in request.url and finger not in self.finger:
+        #                 self.finger.append(finger)
+        #                 logging.info('[+] Found {} script in {}'.format(finger, request.url))
 
     @staticmethod
     async def waitEventsForNavigation(page: Page, event):
@@ -195,7 +200,7 @@ class Browsers:
 
     async def _get_onclick(self, page: Page, content=None, callback=None):
         content = content if content else await page.content()
-        onclick_events = await page.querySelectorAll('*[onclick]')
+        # onclick_events = await page.querySelectorAll('*[onclick]')
         onclick_events_attrs = re.findall('onclick=\"(.+?)\"', content)
         for i in range(len(onclick_events_attrs)):
             if not self.filter_keyword(onclick_events_attrs[i]):
@@ -228,16 +233,17 @@ class Browsers:
                 elif 'window.location' in onclick_events_attrs[i]:
                     await self.waitEventsForNavigation(page, onclick_events[i].click())
                     await self.trigger_events(page, callback=callback)
+            except IndexError as e:
+                await page.goBack()
             except BaseException as e:
                 logging.error(e, exc_info=True)
-
 
         return page
 
     async def _get_href(self, page: Page, callback=None):
         urls = []
         links = await page.querySelectorAllEval('a', 'elements => elements.map(elem => elem.href)')
-        links_labels = await page.querySelectorAll('a')
+        # links_labels = await page.querySelectorAll('a')
         for i in range(len(links)):
             if not self.filter_keyword(links[i]):
                 continue
@@ -278,8 +284,13 @@ class Browsers:
                 if not form_tables_info and not forms_tables:
                     logging.error('The page was also updated, but was not retrieved, exit')
                     break
-            key = self.get_unique_url_key(form_tables_info[offset]['action'] if form_tables_info[offset]['action'] else form_tables_info[offset]['id'],
-                                          slat=str(form_tables_info[offset]['name']), whole=True)
+            u_obj = UrlParse(form_tables_info[offset]['action'])
+
+            key = self.get_unique_url_key(
+                self.get_unique_url_key(url='{}{}'.format(u_obj.geturl(only_domain=True), u_obj.path),
+                                        slat=u_obj.params) if form_tables_info[offset]['action']
+                else form_tables_info[offset]['id'], slat=str(form_tables_info[offset]['name']), whole=True)
+
             if key in self._form_records:
                 continue
             self._form_records.append(key)
@@ -295,9 +306,9 @@ class Browsers:
                                                                                  'type: el.type, name: el.name, '
                                                                                  'value: el.value}})')
             input_labels_info += await forms_tables[offset].querySelectorAllEval('button',
-                                                                                '(els) => els.map(el => {return {'
-                                                                                'type: el.type, name: el.name, '
-                                                                                'value: el.value}})')
+                                                                                 '(els) => els.map(el => {return {'
+                                                                                 'type: el.type, name: el.name, '
+                                                                                 'value: el.value}})')
             submit_button = None
 
             for i in range(len(input_labels_info)):
@@ -331,8 +342,8 @@ class Browsers:
     async def trigger_events(self, page: Page, callback=None):
         try:
             page = await self._get_href(page, callback=callback)
-            page = await self._get_onclick(page, callback=callback)
             page = await self._get_form(page, callback=callback)
+            page = await self._get_onclick(page, callback=callback)
         except Exception as e:
             logging.error(e, exc_info=True)
 
@@ -388,3 +399,12 @@ class Browsers:
             sleep(1)
 
 
+if __name__ == '__main__':
+    headers = {
+        'Cookie': 'csrftoken=adr5Tc4LBxVQkwKngnCuZvP1iAO9YtT4GhwgqodBn7JzdFE5sxjcC6crZhwKcqCf; '
+                  'sessionid=0j0ko147842bpojsxcv4yu3038yr2gxo; PHPSESSID=vgcnl569r3rlncuvt0hb4gqe87; '
+                  'security=impossible '
+    }
+    obj = Browsers(headers=headers)
+    url = 'http://192.168.88.150:8080/vulnerabilities/sqli/'
+    asyncio.get_event_loop().run_until_complete(obj.go_by_page(url))

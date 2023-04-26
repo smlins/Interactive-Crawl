@@ -60,4 +60,3 @@ class UrlParse:
 
         return params_dict
 
-

@@ -27,8 +27,9 @@ class Crawl:
             timeout=timeout,
             headers=kwargs['headers'] if 'headers' in kwargs else None,
             screen_size=kwargs['screen_size'] if 'screen_size' in kwargs else None,
-            exclude_links_keyword=kwargs['exclude_links_keyword'] if 'exclude_links_keyword' in kwargs else None,
-            prohibit_load=kwargs['prohibit_load'] if 'prohibit_load' in kwargs else None
+            exclude_links_keyword=kwargs['exclude_links'] if 'exclude_links' in kwargs else None,
+            prohibit_load=kwargs['prohibit_load'] if 'prohibit_load' in kwargs else None,
+            intercept_request=kwargs['intercept_request'] if 'intercept_request' in kwargs else None
         )
         self.state = 1  # stop is 0, running is 1, finish is 2
         self.thread_task = MultiCoroutine(concurrency=maximum_requests, daemon=False, loop=self.loop)
@@ -48,7 +49,7 @@ class Crawl:
             for url in urls:
                 u_obj = UrlParse(url)
                 key = self.browser_handle.get_unique_url_key(
-                    url='{}{}'.format(u_obj.geturl(only_domain=True), u_obj.path), slat=u_obj.params)
+                    url='{}{}'.format(u_obj.geturl(only_domain=True), u_obj.path), slat=u_obj.query)
                 # Delete if it already exists in the unreachable dict
                 if key in self.not_accessed_dict:
                     self.not_accessed_dict.pop(key)
@@ -75,7 +76,6 @@ class Crawl:
                         self.not_accessed_dict[key] = url
                     elif self.external_links:
                         self.not_accessed_dict[key] = url
-
 
     @script_hook
     def http_context_handle(self, request, response):
@@ -146,25 +146,20 @@ def crawl_task_run(url, server_pipe, options=None, maximum_requests=1):
     :param maximum_requests: maximum coroutine
     :return:
     """
-    args = options['args']
-    headless = options['headless']
-    req_type = options['req_type']
-    external_links = options['external_links']
-    timeout = options['timeout']
-    headers = options['headers']
-    screen_size = options['screen_size']
-    prohibit_load = options['prohibit_load']
+    # args = options['args']
+    # headless = options['headless']
+    # req_type = options['req_type']
+    # external_links = options['external_links']
+    # timeout = options['timeout']
+    # headers = options['headers']
+    # screen_size = options['screen_size']
+    # prohibit_load = options['prohibit_load']
+    # exclude_links = options['exclude_links']
+    # interception_request = options['interception_request']
     task = Crawl(
         url=url,
         maximum_requests=maximum_requests,
-        options=args,
-        headless=headless,
-        filter_req_type=req_type,
-        external_links=external_links,
-        timeout=timeout,
-        headers=headers,
-        screen_size=screen_size,
-        prohibit_load=prohibit_load
+        **options
     )
     task.start_crawl()
     logging.info('thread task is exit')

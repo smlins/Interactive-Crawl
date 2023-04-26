@@ -23,10 +23,10 @@ def main():
                        help='The timeout for all page requests, which is 5 seconds by default', default=5)
     parse.add_argument('--cookie', metavar='', help='Set Http Cookie')
     parse.add_argument('--proxy-server', metavar='', help='Http proxy address in the form of host:port')
-    parse.add_argument('--headless', help='operation mode of browser and false by default', action="store_true")
+    parse.add_argument('--headless', help='operation mode of browser and true by default', metavar='', default=True)
     parse.add_argument('--exclude-links', metavar='',
-                       help='If the link contains this keyword, no request will be made. Multiple keywords are '
-                            'separated by the characters\', \'')
+                       help='If the link contains this keyword, no request will be made. Support for regular '
+                            'expressions.')
     parse.add_argument('--crawl-link-type', metavar='',
                        help='Types of network resources crawled by the crawler, including xhr,fetch,document,'
                             'stylesheet,script,image,media,websocket,font', default='xhr,fetch,document')
@@ -36,12 +36,16 @@ def main():
     parse.add_argument('--crawl-external-links',
                        help='Enable external link crawling. only the same site link is crawled by default',
                        action='store_true')
+    parse.add_argument('--intercept-request', help='Enable HTTP request interception. The \'--exhibit-load-type\' '
+                                                   'parameter only takes effect when this option is enabled',
+                       action='store_true')
 
 
     args = parse.parse_args()
     browser_options = {
         'headless': args.headless,
         'external_links': args.crawl_external_links,
+        'exclude_links': args.exclude_links,
         'prohibit_load': [],
         'args': [],
         'req_type': [],
